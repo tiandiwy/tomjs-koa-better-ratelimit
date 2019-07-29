@@ -11,12 +11,8 @@
  * Module dependencies.
  */
 
-var ipchecker = require('ipchecker');
-
 var defaults = {
   duration: 1000 * 60 * 60 * 24,
-  whiteList: [],
-  blackList: [],
   accessLimited: '429: Too Many Requests.',
   accessForbidden: '403: This is forbidden area for you.',
   max: 500,
@@ -33,9 +29,9 @@ var defaults = {
 module.exports = function betterlimit(options) {
   options = options || {};
 
-  var db = {};
+  let db = {};
 
-  for (var key in defaults) {
+  for (let key in defaults) {
     if (!options[key]) { options[key] = defaults[key] }
   }
 
@@ -47,42 +43,43 @@ module.exports = function betterlimit(options) {
     options.accessForbidden = options.message_403;
   }
 
-  var whiteListMap = ipchecker.map(options.whiteList);
-  var blackListMap = ipchecker.map(options.blackList);
+  options.clear_interval = parseInt(options.clear_interval);
+  if (options.clear_interval > 0) {
+    setInterval(() => {
+      let now = Date.now();
+      for (let idx in db) {
+        if (db[idx].reset < now) {
+          delete db[idx];
+        }
+      }
+    }, options.clear_interval);
+  }
 
   return async function ratelimit(ctx, next) {
     let ip = ctx.ip;
-    if (typeof (options.id) == 'function') {
-      ip = await options.id(ctx, next);
+    if (typeof (options.ip) == 'function') {
+      ip = await options.ip(ctx);
     }
 
     if (!ip) {
       return next();
     }
-    if (ipchecker.check(ip, blackListMap)) {
-      ctx.status = 403;
-      ctx.body = options.accessForbidden;
-      return;
-    }
-    if (ipchecker.check(ip, whiteListMap)) {
-      return next();
-    }
 
-    var now = Date.now()
-    var reset = now + options.duration;
+    let now = Date.now()
+    let reset = now + options.duration;
 
     if (!db.hasOwnProperty(ip)) {
       db[ip] = { ip: ip, reset: reset, limit: options.max }
     }
 
-    var delta = db[ip].reset - now
-    var retryAfter = delta / 1000 | 0;
+    let delta = db[ip].reset - now
+    let retryAfter = delta / 1000 | 0;
 
     db[ip].limit = db[ip].limit - 1
     ctx.response.set('X-RateLimit-Limit', options.max);
 
     if (db[ip].reset > now) {
-      var rateLimiting = db[ip].limit < 0 ? 0 : db[ip].limit;
+      let rateLimiting = db[ip].limit < 0 ? 0 : db[ip].limit;
       ctx.response.set('X-RateLimit-Remaining', rateLimiting);
     }
 
