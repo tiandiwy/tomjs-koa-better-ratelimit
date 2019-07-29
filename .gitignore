@@ -1,0 +1,16 @@
+/node_modules
+npm-debug.log
+yarn-error.log
+.env
+/.vscode
+/public/uploads/tmp
+/.compiled
+/logs
+/keys
+package-lock.json
+.coveralls.yml
+.editorconfig
+.jscsrc
+.jshintignore
+.jshintrc
+.travis.yml

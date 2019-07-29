@@ -1,0 +1,52 @@
+{  
+  "bugs": {
+    "url": "https://github.com/tiandiwy/tomjs-koa-better-ratelimit/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "ipchecker": "*"
+  },
+  "deprecated": false,
+  "description": "Better, smaller, faster - koa middleware for limit request by ip, store in-memory.",
+  "devDependencies": {
+    "coveralls": "^2.11.2",
+    "istanbul-harmony": "^0.3.1",
+    "jscs": ">=1.8.0",
+    "jscs-jsdoc": ">=0.2.0",
+    "jshint": "^2.5.10",
+    "koa": "*",
+    "mocha": "^2.0.1",
+    "mocha-lcov-reporter": "0.0.1",
+    "should": "*",
+    "supertest": "*"
+  },
+  "engines": {
+    "node": ">= 0.11.14",
+    "npm": ">= 1.4.28"
+  },
+  "homepage": "https://github.com/tiandiwy/tomjs-koa-better-ratelimit",
+  "keywords": [
+    "koa",
+    "middleware",
+    "ratelimit",
+    "requestlimit",
+    "limit",
+    "in-memory",
+    "memorystore",
+    "rate"
+  ],
+  "license": "MIT",
+  "name": "tomjs-koa-better-ratelimit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tiandiwy/tomjs-koa-better-ratelimit.git"
+  },
+  "scripts": {
+    "coveralls": "npm run test-travis && cat coverage/lcov.info | node_modules/.bin/coveralls",
+    "lint": "npm install && node_modules/.bin/jshint . && node_modules/.bin/jscs . --reporter inline --esnext",
+    "test": "npm run lint && node_modules/.bin/mocha --harmony-generators --require should",
+    "test-cov": "npm run lint && node --harmony node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- --require should",
+    "test-travis": "npm run lint && node --harmony node_modules/.bin/istanbul cover node_modules/.bin/_mocha --report lcovonly -- --require should"
+  },
+  "version": "2.1.3"
+}
