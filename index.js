@@ -76,26 +76,28 @@ module.exports = function betterlimit(options) {
     let retryAfter = delta / 1000 | 0;
 
     db[ip].limit = db[ip].limit - 1
-    ctx.response.set('X-RateLimit-Limit', options.max);
+    try { ctx.response.set('X-RateLimit-Limit', options.max); } catch (e) { }
 
     if (db[ip].reset > now) {
       let rateLimiting = db[ip].limit < 0 ? 0 : db[ip].limit;
-      ctx.response.set('X-RateLimit-Remaining', rateLimiting);
+      try { ctx.response.set('X-RateLimit-Remaining', rateLimiting); } catch (e) { }
     }
 
     if (db[ip].limit < 0 && db[ip].reset < now) {
       db[ip] = { ip: ip, reset: reset, limit: options.max }
       db[ip].limit = db[ip].limit - 1;
-      ctx.response.set('X-RateLimit-Remaining', db[ip].limit);
+      try { ctx.response.set('X-RateLimit-Remaining', db[ip].limit); } catch (e) { }
     }
 
-    ctx.response.set('X-RateLimit-Reset', db[ip].reset);
+    try { ctx.response.set('X-RateLimit-Reset', db[ip].reset); } catch (e) { }
 
     if (db[ip].limit < 0) {
-      ctx.response.set('Retry-After', retryAfter);
-      ctx.status = 429;
-      ctx.body = options.accessLimited
-      return;
+      try {
+        ctx.response.set('Retry-After', retryAfter);
+        ctx.status = 429;
+        ctx.body = options.accessLimited;
+      } catch (e) { }
+      return db[ip];
     }
 
     return next();
